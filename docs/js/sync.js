@@ -62,8 +62,13 @@ async function runSyncSafe() {
     if (result.settings) {
       state.setSettings(result.settings);
     }
+    if (result.categories) {
+      state.setCategories(result.categories);
+    }
     state.setLastSync(result.serverTime);
     state.setOnline(true);
+    state.setSynced(true);
+    await flushPending(onStatus);
   } catch (err) {
     state.setOnline(false);
   }

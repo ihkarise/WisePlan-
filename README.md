@@ -20,12 +20,18 @@ Sheets**. No frameworks, no build step — vanilla HTML/CSS/JS ES modules.
   setting, refreshed through sync; hidden when empty.
 - **Service pause** — closing Photography/Food disables the matching Done action
   and shows a "Temporarily Paused" notice on that queue.
+- **Categories** — Add Group uses category/subcategory chips populated
+  dynamically from the `Categories` sheet (no hardcoded values).
+- **Offline** — writes are queued durably (deduplicated), retried automatically
+  on reconnect, and the header shows "Offline Mode" with a queued count.
+- **Dark mode** — follows the system theme with a manual toggle persisted to
+  localStorage; theming is CSS-variable only (no duplicated rules).
 - **PWA** — installable, cache-first shell, offline reads from local cache.
 
 Auth is a single shared API key in `config.js` (one trusted event, 5–10
 volunteers) — no login, roles, or user management.
 
-Not yet built: settings editing (event name / announcement) and dark mode.
+Not yet built: in-app settings editing (event name / announcement).
 
 ## Architecture
 

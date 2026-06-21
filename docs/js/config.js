@@ -26,6 +26,9 @@ export const CONFIG = {
     GROUPS: 'wef.groups',
     REQUESTS: 'wef.requests',
     SETTINGS: 'wef.settings',
+    CATEGORIES: 'wef.categories',
+    PENDING: 'wef.pending',
+    THEME: 'wef.theme',
     LAST_SYNC: 'wef.lastSync'
   }
 };

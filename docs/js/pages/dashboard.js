@@ -9,6 +9,7 @@ import { GroupCard } from '../components/groupCard.js';
 import { StatsBar } from '../components/statsBar.js';
 import { ServiceToggles } from '../components/serviceToggles.js';
 import { SearchBar } from '../components/searchBar.js';
+import { SkeletonList } from '../components/skeleton.js';
 import { togglePhotographyAction, toggleFoodAction } from '../actions.js';
 import { showToast } from '../components/toast.js';
 import * as state from '../state.js';
@@ -68,6 +69,11 @@ function countBy(groups, field, value) {
 }
 
 function paintList(list, count, query) {
+  if (!state.hasSynced() && state.getGroups().length === 0) {
+    count.textContent = '';
+    mount(list, SkeletonList());
+    return;
+  }
   const groups = filterGroups(state.getGroups(), query);
   count.textContent = label(groups.length, query);
   if (groups.length === 0) {

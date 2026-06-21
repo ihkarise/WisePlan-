@@ -34,6 +34,32 @@
   color: #000;
 }
 
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.header__pending {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: var(--space-1) var(--space-2);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.22);
+  color: #fff;
+}
+
+.header__theme {
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
 /* Bottom navigation */
 .bottom-nav {
   display: flex;
@@ -131,6 +157,11 @@
   border-radius: var(--radius);
   box-shadow: var(--shadow-card);
   padding: var(--space-3);
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.group-card:active {
+  transform: scale(0.995);
 }
 
 .group-card.is-pending {
@@ -509,4 +540,82 @@
   color: #92560a;
   font-weight: 700;
   text-align: center;
+}
+
+/* Selectable chips (category / subcategory) */
+.chips {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  padding-bottom: var(--space-1);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.chips::-webkit-scrollbar {
+  display: none;
+}
+
+.chip-btn {
+  flex: 0 0 auto;
+  min-height: 2.75rem;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.chip-btn.is-selected {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+/* Loading skeletons */
+.skeleton-card {
+  display: flex;
+  gap: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+}
+
+.skeleton-card__body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  justify-content: center;
+}
+
+.skeleton {
+  border-radius: var(--radius);
+  background: linear-gradient(90deg, var(--skeleton-base) 25%, var(--skeleton-shine) 37%, var(--skeleton-base) 63%);
+  background-size: 400% 100%;
+  animation: skeleton-shine 1.4s ease infinite;
+}
+
+.skeleton--badge {
+  width: 3.25rem;
+  height: 3.25rem;
+  flex: 0 0 auto;
+}
+
+.skeleton--line {
+  height: 0.9rem;
+  width: 80%;
+}
+
+.skeleton--short {
+  width: 45%;
+}
+
+@keyframes skeleton-shine {
+  from { background-position: 100% 50%; }
+  to { background-position: 0 50%; }
 }

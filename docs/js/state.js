@@ -14,8 +14,10 @@ const state = {
   groups: new Map(),                       // keyed by group ID
   requests: new Map(),                     // keyed by RequestID (active only)
   settings: readJson(CONFIG.STORAGE.SETTINGS, null),
+  categories: readJson(CONFIG.STORAGE.CATEGORIES, []),
   lastSync: readString(CONFIG.STORAGE.LAST_SYNC, ''),
-  online: navigator.onLine
+  online: navigator.onLine,
+  synced: false
 };
 
 // Hydrate from cache so the UI renders instantly, even offline.
@@ -126,6 +128,32 @@ export function setSettings(settings) {
   state.settings = settings;
   writeJson(CONFIG.STORAGE.SETTINGS, settings);
   notify();
+}
+
+/** Categories for the Add Group chips. */
+export function getCategories() {
+  return state.categories || [];
+}
+
+export function setCategories(categories) {
+  if (!Array.isArray(categories)) {
+    return;
+  }
+  state.categories = categories;
+  writeJson(CONFIG.STORAGE.CATEGORIES, categories);
+  notify();
+}
+
+/** True once at least one successful sync has completed this session. */
+export function hasSynced() {
+  return state.synced;
+}
+
+export function setSynced(value) {
+  if (state.synced !== value) {
+    state.synced = value;
+    notify();
+  }
 }
 
 export function setLastSync(timestamp) {

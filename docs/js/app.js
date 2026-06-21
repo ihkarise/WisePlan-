@@ -17,7 +17,8 @@ import { renderPhotoQueue } from './pages/photoQueue.js';
 import { renderFoodQueue } from './pages/foodQueue.js';
 import { renderRequests } from './pages/requests.js';
 import { startSync } from './sync.js';
-import { resolveRequestAction } from './actions.js';
+import { resolveRequestAction, pendingCount } from './actions.js';
+import { initTheme, currentTheme, toggleTheme } from './utils/theme.js';
 import * as state from './state.js';
 
 const ROUTES = {
@@ -40,6 +41,7 @@ let route = 'dashboard';
 let current = null;
 
 function start() {
+  initTheme();
   if (!isApiConfigured()) {
     showToast('Set API_URL and API_KEY in config.js to connect', 'warn');
   }
@@ -55,7 +57,10 @@ function renderShell() {
   const settings = state.getSettings();
   mount(shell.header, Header({
     eventName: settings ? settings.EventName : 'Wise EventFlow',
-    online: state.isOnline()
+    online: state.isOnline(),
+    theme: currentTheme(),
+    onToggleTheme: () => { toggleTheme(); renderShell(); },
+    pending: pendingCount()
   }));
   mount(shell.announce, AnnouncementBanner({ text: settings ? settings.Announcement : '' }));
   mount(shell.banner, RequestBanner({

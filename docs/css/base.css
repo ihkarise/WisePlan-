@@ -30,6 +30,24 @@
   --radius: 0.75rem;
   --touch-target: 3rem; /* 48px minimum */
   --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.12);
+  --skeleton-base: #E2E8E6;
+  --skeleton-shine: #EEF3F1;
+  color-scheme: light;
+}
+
+/* Dark theme: override tokens only — no duplicated component rules. */
+:root[data-theme="dark"] {
+  --color-primary: #14B8A6;
+  --color-primary-dark: #0D9488;
+  --color-bg: #0E1413;
+  --color-surface: #1A2120;
+  --color-border: #2C3735;
+  --color-text: #E6EDEC;
+  --color-text-muted: #98A8A4;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --skeleton-base: #232C2A;
+  --skeleton-shine: #2E3937;
+  color-scheme: dark;
 }
 
 *,
@@ -51,6 +69,7 @@ body {
   color: var(--color-text);
   background: var(--color-bg);
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 h1, h2, h3, p {

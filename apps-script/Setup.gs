@@ -34,6 +34,7 @@ function setupSheets() {
     ensureSheetWithHeaders(ss, name, SHEET_HEADERS[name]);
   });
   seedSettings();
+  seedCategories();
   var key = ensureApiKey();
   SpreadsheetApp.getUi().alert(
     'Setup complete.\n\nShared API key:\n' + key +
@@ -60,6 +61,26 @@ function seedSettings() {
   if (sheet.getLastRow() < 2) {
     sheet.appendRow(['Wise EventFlow', true, true, '']);
   }
+}
+
+/** Seed the default categories and organization subcategories when empty. */
+function seedCategories() {
+  var sheet = getSheet(SHEETS.CATEGORIES);
+  if (sheet.getLastRow() >= 2) {
+    return;
+  }
+  var rows = [
+    ['Friends', '', true, 1],
+    ['Family', '', true, 2],
+    ['VIP', '', true, 3],
+    ['Organizations', 'IHK', true, 4],
+    ['Organizations', 'Senior IHK', true, 5],
+    ['Organizations', 'JCI', true, 6],
+    ['Organizations', 'Sahya', true, 7],
+    ['Organizations', 'Lions', true, 8],
+    ['Others', '', true, 9]
+  ];
+  sheet.getRange(2, 1, rows.length, rows[0].length).setValues(rows);
 }
 
 /**

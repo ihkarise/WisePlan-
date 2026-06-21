@@ -11,9 +11,9 @@ in order.
 2. In the Sheet: **Extensions → Apps Script**.
 3. Delete the default `Code.gs`, then create one script file per `.gs` file in
    [`apps-script/`](apps-script/) and paste the matching contents:
-   `Code.gs`, `Setup.gs`, `Auth.gs`, `Settings.gs`, `Groups.gs`, `Requests.gs`,
-   `Sync.gs`, `Utils.gs`. (Apps Script concatenates all files, so the split is
-   just for readability.)
+   `Code.gs`, `Setup.gs`, `Auth.gs`, `Settings.gs`, `Groups.gs`, `Categories.gs`,
+   `Requests.gs`, `Sync.gs`, `Utils.gs`. (Apps Script concatenates all files, so
+   the split is just for readability.)
 4. Optional but recommended: set the project manifest to match
    [`apps-script/appsscript.json`](apps-script/appsscript.json)
    (**Project Settings → Show "appsscript.json"**).

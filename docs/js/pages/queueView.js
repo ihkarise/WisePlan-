@@ -7,6 +7,7 @@
 
 import { el, mount } from '../utils/dom.js';
 import { GroupCard } from '../components/groupCard.js';
+import { SkeletonList } from '../components/skeleton.js';
 import { updateStatusAction } from '../actions.js';
 import { showToast } from '../components/toast.js';
 import * as state from '../state.js';
@@ -30,6 +31,11 @@ export function renderQueue(config) {
 }
 
 function paint(list, count, config) {
+  if (!state.hasSynced() && state.getGroups().length === 0) {
+    count.textContent = '';
+    mount(list, SkeletonList(3));
+    return;
+  }
   const groups = waitingGroups(config.statusField);
   const open = serviceOpen(config.serviceField);
   count.textContent = groups.length === 1 ? '1 group waiting' : groups.length + ' groups waiting';
