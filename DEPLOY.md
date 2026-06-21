@@ -12,8 +12,9 @@ in order.
 3. Delete the default `Code.gs`, then create one script file per `.gs` file in
    [`apps-script/`](apps-script/) and paste the matching contents:
    `Code.gs`, `Setup.gs`, `Auth.gs`, `Settings.gs`, `Groups.gs`, `Categories.gs`,
-   `Requests.gs`, `Sync.gs`, `Utils.gs`. (Apps Script concatenates all files, so
-   the split is just for readability.)
+   `Requests.gs`, `Sync.gs`, `Utils.gs`, and (optional, development only)
+   `Dev.gs`. (Apps Script concatenates all files, so the split is just for
+   readability.)
 4. Optional but recommended: set the project manifest to match
    [`apps-script/appsscript.json`](apps-script/appsscript.json)
    (**Project Settings → Show "appsscript.json"**).
@@ -62,6 +63,16 @@ in order.
 
 The shared API key in `config.js` authorizes every request — there is no login.
 All 5–10 volunteers use the same published URL.
+
+## Development seeding (optional, never in production)
+
+`Dev.gs` can fill the sheet with sample data for testing. It is not exposed over
+HTTP and refuses to run unless dev mode is on:
+
+1. In the editor run `enableDevMode()` once.
+2. Run `seedSampleData()` → 50 mixed groups + 5 active requests.
+3. Run `clearSampleData()` to remove them, then `disableDevMode()` before going
+   live. (With dev mode off the seeders stay inert even if `Dev.gs` ships.)
 
 ## Troubleshooting
 

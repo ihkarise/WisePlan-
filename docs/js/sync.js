@@ -12,6 +12,7 @@ import { flushPending } from './actions.js';
 
 let timerId = null;
 let running = false;
+let syncing = false;
 let onStatus = () => {};
 
 /**
@@ -51,12 +52,28 @@ async function tick() {
 
 /** A single delta sync, with all errors contained (offline is normal). */
 async function runSyncSafe() {
+  if (syncing) {
+    return; // a cycle is already in flight; avoid overlapping fetches
+  }
   if (!navigator.onLine) {
     state.setOnline(false);
     return;
   }
+  syncing = true;
   try {
     const result = await api.fetchSync(state.getLastSync());
+    applyResult(result);
+    await flushPending(onStatus);
+  } catch (err) {
+    state.setOnline(false);
+  } finally {
+    syncing = false;
+  }
+}
+
+/** Apply a sync result as one batched update (single re-render). */
+function applyResult(result) {
+  state.batch(() => {
     state.upsertGroups(result.changed);
     state.setRequests(result.requests);
     if (result.settings) {
@@ -68,10 +85,7 @@ async function runSyncSafe() {
     state.setLastSync(result.serverTime);
     state.setOnline(true);
     state.setSynced(true);
-    await flushPending(onStatus);
-  } catch (err) {
-    state.setOnline(false);
-  }
+  });
 }
 
 /** Fetch settings a single time at startup (cached thereafter). */

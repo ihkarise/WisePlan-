@@ -47,6 +47,9 @@ function resolveRequest(actor, payload) {
       throw new Error('Request not found');
     }
     var row = sheet.getRange(rowIndex, 1, 1, REQUEST_HEADERS.length).getValues()[0];
+    if (String(row[3]) === REQUEST_RESOLVED) {
+      return rowToObject(REQUEST_HEADERS, row); // already resolved; first writer keeps FoundBy
+    }
     row[3] = REQUEST_RESOLVED;          // Status
     row[4] = actor;                     // FoundBy
     sheet.getRange(rowIndex, 1, 1, REQUEST_HEADERS.length).setValues([row]);

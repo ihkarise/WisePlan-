@@ -9,6 +9,8 @@ import { CONFIG } from './config.js';
 import { readJson, writeJson, readString } from './utils/storage.js';
 
 const listeners = new Set();
+let batchDepth = 0;
+let pendingNotify = false;
 
 const state = {
   groups: new Map(),                       // keyed by group ID
@@ -28,6 +30,23 @@ hydrateRequests();
 export function subscribe(listener) {
   listeners.add(listener);
   return () => listeners.delete(listener);
+}
+
+/**
+ * Group several mutations into a single notification. Used by sync so one poll
+ * triggers at most one re-render instead of one per field updated.
+ */
+export function batch(fn) {
+  batchDepth += 1;
+  try {
+    fn();
+  } finally {
+    batchDepth -= 1;
+    if (batchDepth === 0 && pendingNotify) {
+      pendingNotify = false;
+      emit();
+    }
+  }
 }
 
 /** Groups sorted by QueueNo ascending for stable display. */
@@ -95,14 +114,18 @@ export function getRequests() {
     .sort((a, b) => String(b.Time).localeCompare(String(a.Time)));
 }
 
-/** Replace the active request set (authoritative, from sync). */
+/** Replace the active request set (authoritative, from sync). No-op if same. */
 export function setRequests(requests) {
-  state.requests = new Map();
+  const next = new Map();
   (requests || []).forEach((r) => {
     if (r && r.RequestID) {
-      state.requests.set(String(r.RequestID), r);
+      next.set(String(r.RequestID), r);
     }
   });
+  if (requestSignature(next) === requestSignature(state.requests)) {
+    return;
+  }
+  state.requests = next;
   persistRequests();
   notify();
 }
@@ -125,6 +148,9 @@ export function removeRequestLocal(id) {
 }
 
 export function setSettings(settings) {
+  if (sameJson(settings, state.settings)) {
+    return;
+  }
   state.settings = settings;
   writeJson(CONFIG.STORAGE.SETTINGS, settings);
   notify();
@@ -136,7 +162,7 @@ export function getCategories() {
 }
 
 export function setCategories(categories) {
-  if (!Array.isArray(categories)) {
+  if (!Array.isArray(categories) || sameJson(categories, state.categories)) {
     return;
   }
   state.categories = categories;
@@ -195,7 +221,27 @@ function persistRequests() {
 }
 
 function notify() {
+  if (batchDepth > 0) {
+    pendingNotify = true;
+    return;
+  }
+  emit();
+}
+
+function emit() {
   listeners.forEach((listener) => listener(state));
+}
+
+/** Stable fingerprint of a request map (id + status) to detect real changes. */
+function requestSignature(map) {
+  return Array.from(map.values())
+    .map((r) => String(r.RequestID) + ':' + String(r.Status))
+    .sort()
+    .join('|');
+}
+
+function sameJson(a, b) {
+  return JSON.stringify(a) === JSON.stringify(b);
 }
 
 function num(value) {
