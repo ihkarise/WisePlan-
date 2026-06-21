@@ -28,6 +28,16 @@ function isDevMode() {
   return PropertiesService.getScriptProperties().getProperty(DEV_MODE_PROPERTY) === 'true';
 }
 
+/** Alias for seedSampleData() (acceptance-test name). Dev mode only. */
+function seedData() {
+  return seedSampleData();
+}
+
+/** Alias for clearSampleData() (acceptance-test name). Dev mode only. */
+function clearSeedData() {
+  return clearSampleData();
+}
+
 /** Populate 50 mixed sample groups and 5 active requests. Dev mode only. */
 function seedSampleData() {
   assertDevMode();
