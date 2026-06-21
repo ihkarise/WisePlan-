@@ -45,11 +45,15 @@ function actionRow(actions) {
 }
 
 function actionButton(action) {
+  const attrs = { type: 'button' };
+  if (action.disabled) {
+    attrs.disabled = 'disabled';
+  }
   return el('button', {
     className: 'btn btn--' + (action.kind || 'ghost') + ' group-card__action',
-    attrs: { type: 'button' },
+    attrs: attrs,
     text: action.label,
-    on: { click: action.onClick }
+    on: { click: action.disabled ? () => {} : action.onClick }
   });
 }
 

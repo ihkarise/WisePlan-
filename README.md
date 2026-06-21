@@ -14,12 +14,18 @@ Sheets**. No frameworks, no build step — vanilla HTML/CSS/JS ES modules.
 - **Food Queue** — groups waiting for food; **Food Done** / **Skip**.
 - **Requests** — raise a request for a group; it shows as a fixed banner on every
   phone via sync; the first volunteer to **Resolve** clears it everywhere.
+- **Dashboard** — live stat cards, debounced client-side search (name / category
+  / subcategory), and Photography/Food OPEN-CLOSED toggles.
+- **Announcement banner** — fixed top banner driven by the `Announcement`
+  setting, refreshed through sync; hidden when empty.
+- **Service pause** — closing Photography/Food disables the matching Done action
+  and shows a "Temporarily Paused" notice on that queue.
 - **PWA** — installable, cache-first shell, offline reads from local cache.
 
 Auth is a single shared API key in `config.js` (one trusted event, 5–10
 volunteers) — no login, roles, or user management.
 
-Not yet built: search, statistics, settings editing, and dark mode.
+Not yet built: settings editing (event name / announcement) and dark mode.
 
 ## Architecture
 

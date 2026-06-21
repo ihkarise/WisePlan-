@@ -9,6 +9,7 @@ import { mount } from './utils/dom.js';
 import { Header } from './components/header.js';
 import { BottomNav } from './components/bottomNav.js';
 import { RequestBanner } from './components/requestBanner.js';
+import { AnnouncementBanner } from './components/announcementBanner.js';
 import { showToast } from './components/toast.js';
 import { renderDashboard } from './pages/dashboard.js';
 import { renderAddGroup } from './pages/addGroup.js';
@@ -29,6 +30,7 @@ const ROUTES = {
 
 const shell = {
   header: document.getElementById('app-header'),
+  announce: document.getElementById('app-announce'),
   banner: document.getElementById('app-banner'),
   view: document.getElementById('app-view'),
   nav: document.getElementById('app-nav')
@@ -55,6 +57,7 @@ function renderShell() {
     eventName: settings ? settings.EventName : 'Wise EventFlow',
     online: state.isOnline()
   }));
+  mount(shell.announce, AnnouncementBanner({ text: settings ? settings.Announcement : '' }));
   mount(shell.banner, RequestBanner({
     requests: state.getRequests(),
     onResolve: (request) => resolveRequestAction(request, showToast)

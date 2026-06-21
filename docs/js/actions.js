@@ -122,6 +122,31 @@ export async function resolveRequestAction(request, notifyUser) {
   }
 }
 
+/** Toggle photography open/closed with optimistic settings update. */
+export async function togglePhotographyAction(open, notifyUser) {
+  return applyToggle('togglePhotography', { PhotographyOpen: open }, open, notifyUser);
+}
+
+/** Toggle food service open/closed with optimistic settings update. */
+export async function toggleFoodAction(open, notifyUser) {
+  return applyToggle('toggleFood', { FoodOpen: open }, open, notifyUser);
+}
+
+/** Shared toggle flow: optimistic settings patch, server call, revert on fail. */
+async function applyToggle(method, patch, open, notifyUser) {
+  const prior = state.getSettings();
+  state.setSettings(Object.assign({}, prior, patch));
+  try {
+    const settings = await api[method](open);
+    state.setSettings(settings);
+  } catch (err) {
+    if (prior) {
+      state.setSettings(prior);
+    }
+    notifyUser(err.message || 'Could not update setting', 'error');
+  }
+}
+
 /** Capture the prior values of the fields a patch will overwrite. */
 function snapshot(group, fields) {
   const prior = {};

@@ -66,6 +66,10 @@ function routeWrite(action, actor, payload) {
       return ok({ request: requestGroup(actor, payload) });
     case 'resolveRequest':
       return ok({ request: resolveRequest(actor, payload) });
+    case 'togglePhotography':
+      return ok({ settings: togglePhotography(actor, payload) });
+    case 'toggleFood':
+      return ok({ settings: toggleFood(actor, payload) });
     default:
       return fail('Unknown POST action: ' + action, 'BAD_ACTION');
   }

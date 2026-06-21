@@ -24,7 +24,8 @@ function getSync(since) {
     since: since || '',
     serverTime: serverTime,
     changed: changed,
-    requests: getActiveRequests(groups)
+    requests: getActiveRequests(groups),
+    settings: getSettings()
   };
 }
 

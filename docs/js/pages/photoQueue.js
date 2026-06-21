@@ -13,6 +13,8 @@ export function renderPhotoQueue() {
     doneAction: 'photoDone',
     skipAction: 'photoSkip',
     doneLabel: 'Photo Done',
-    emptyHint: 'No groups are waiting for photography.'
+    emptyHint: 'No groups are waiting for photography.',
+    serviceField: 'PhotographyOpen',
+    pausedMessage: 'Photography Temporarily Paused'
   });
 }

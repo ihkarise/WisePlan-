@@ -57,6 +57,18 @@ export async function resolveRequest(requestId) {
   return data.request;
 }
 
+/** Open/close photography. Returns the updated settings. */
+export async function togglePhotography(open) {
+  const data = await postJson('togglePhotography', { open });
+  return data.settings;
+}
+
+/** Open/close food service. Returns the updated settings. */
+export async function toggleFood(open) {
+  const data = await postJson('toggleFood', { open });
+  return data.settings;
+}
+
 /** Build the GET URL with action, key, and extra params. */
 function buildUrl(params) {
   const url = new URL(CONFIG.API_URL);

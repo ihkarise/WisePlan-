@@ -59,6 +59,9 @@ async function runSyncSafe() {
     const result = await api.fetchSync(state.getLastSync());
     state.upsertGroups(result.changed);
     state.setRequests(result.requests);
+    if (result.settings) {
+      state.setSettings(result.settings);
+    }
     state.setLastSync(result.serverTime);
     state.setOnline(true);
   } catch (err) {

@@ -13,6 +13,8 @@ export function renderFoodQueue() {
     doneAction: 'foodDone',
     skipAction: 'foodSkip',
     doneLabel: 'Food Done',
-    emptyHint: 'No groups are waiting for food.'
+    emptyHint: 'No groups are waiting for food.',
+    serviceField: 'FoodOpen',
+    pausedMessage: 'Food Service Temporarily Paused'
   });
 }

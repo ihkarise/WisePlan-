@@ -15,8 +15,11 @@ var GROUP_HEADERS = [
 // Canonical Requests header order. Shared with Requests.gs serialization.
 var REQUEST_HEADERS = ['RequestID', 'GroupID', 'RequestedBy', 'Status', 'FoundBy', 'Time'];
 
+// Canonical Settings header order. Shared with Settings.gs writes.
+var SETTINGS_HEADERS = ['EventName', 'PhotographyOpen', 'FoodOpen', 'Announcement'];
+
 var SHEET_HEADERS = {
-  Settings: ['EventName', 'PhotographyOpen', 'FoodOpen', 'Announcement'],
+  Settings: SETTINGS_HEADERS,
   Groups: GROUP_HEADERS,
   Categories: ['Category', 'SubCategory', 'Active', 'SortOrder'],
   Requests: REQUEST_HEADERS,

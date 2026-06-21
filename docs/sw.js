@@ -5,7 +5,7 @@
  * Bump CACHE_VERSION on any shell change to invalidate old caches.
  */
 
-const CACHE_VERSION = 'wef-shell-v2';
+const CACHE_VERSION = 'wef-shell-v3';
 
 const SHELL_ASSETS = [
   './',
@@ -27,6 +27,10 @@ const SHELL_ASSETS = [
   './js/components/groupCard.js',
   './js/components/toast.js',
   './js/components/requestBanner.js',
+  './js/components/announcementBanner.js',
+  './js/components/searchBar.js',
+  './js/components/statsBar.js',
+  './js/components/serviceToggles.js',
   './js/pages/dashboard.js',
   './js/pages/addGroup.js',
   './js/pages/queueView.js',

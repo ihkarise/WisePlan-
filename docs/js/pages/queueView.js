@@ -31,23 +31,44 @@ export function renderQueue(config) {
 
 function paint(list, count, config) {
   const groups = waitingGroups(config.statusField);
+  const open = serviceOpen(config.serviceField);
   count.textContent = groups.length === 1 ? '1 group waiting' : groups.length + ' groups waiting';
-  if (groups.length === 0) {
-    mount(list, emptyState(config.emptyHint));
-    return;
+  const children = [];
+  if (!open) {
+    children.push(pausedNotice(config.pausedMessage));
   }
-  mount(list, groups.map((group) => GroupCard(group, actionsFor(group, config))));
+  if (groups.length === 0) {
+    children.push(emptyState(config.emptyHint));
+  } else {
+    groups.forEach((group) => children.push(GroupCard(group, actionsFor(group, config, open))));
+  }
+  mount(list, children);
 }
 
 function waitingGroups(statusField) {
   return state.getGroups().filter((g) => String(g[statusField]).toLowerCase() === 'waiting');
 }
 
-function actionsFor(group, config) {
+/** A service is open unless settings explicitly say otherwise. */
+function serviceOpen(serviceField) {
+  const settings = state.getSettings();
+  if (!settings || settings[serviceField] === undefined) {
+    return true;
+  }
+  return !!settings[serviceField];
+}
+
+function actionsFor(group, config, open) {
   return [
-    { label: config.doneLabel, kind: 'primary', onClick: () => updateStatusAction(config.doneAction, group, showToast) },
+    { label: config.doneLabel, kind: 'primary', disabled: !open, onClick: () => updateStatusAction(config.doneAction, group, showToast) },
     { label: 'Skip', kind: 'ghost', onClick: () => updateStatusAction(config.skipAction, group, showToast) }
   ];
+}
+
+function pausedNotice(message) {
+  return el('div', { className: 'paused', attrs: { role: 'status' } }, [
+    el('span', { className: 'paused__text', text: message })
+  ]);
 }
 
 function emptyState(hint) {
