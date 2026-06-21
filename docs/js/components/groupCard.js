@@ -8,17 +8,17 @@ import { el } from '../utils/dom.js';
 
 /**
  * @param {Object} group a serialized Groups row.
+ * @param {Array<{label:string, kind?:string, onClick:Function}>} [actions]
  * @return {HTMLElement}
  */
-export function GroupCard(group) {
-  const card = el('article', {
+export function GroupCard(group, actions = []) {
+  return el('article', {
     className: 'group-card' + (group._optimistic ? ' is-pending' : ''),
     dataset: { id: group.ID }
   }, [
     queueBadge(group.QueueNo),
-    body(group)
+    body(group, actions)
   ]);
-  return card;
 }
 
 function queueBadge(queueNo) {
@@ -28,12 +28,29 @@ function queueBadge(queueNo) {
   ]);
 }
 
-function body(group) {
-  return el('div', { className: 'group-card__body' }, [
+function body(group, actions) {
+  const children = [
     el('h3', { className: 'group-card__name', text: group.GroupName || 'Unnamed group' }),
     meta(group),
     chips(group)
-  ]);
+  ];
+  if (actions && actions.length) {
+    children.push(actionRow(actions));
+  }
+  return el('div', { className: 'group-card__body' }, children);
+}
+
+function actionRow(actions) {
+  return el('div', { className: 'group-card__actions' }, actions.map(actionButton));
+}
+
+function actionButton(action) {
+  return el('button', {
+    className: 'btn btn--' + (action.kind || 'ghost') + ' group-card__action',
+    attrs: { type: 'button' },
+    text: action.label,
+    on: { click: action.onClick }
+  });
 }
 
 function meta(group) {
@@ -56,6 +73,19 @@ function chips(group) {
 
 function statusChip(label, status) {
   const value = status || 'Pending';
-  const kind = value.toLowerCase() === 'done' ? 'done' : 'pending';
-  return el('span', { className: 'chip chip--' + kind, text: label + ': ' + value });
+  return el('span', { className: 'chip chip--' + chipKind(value), text: label + ': ' + value });
+}
+
+function chipKind(value) {
+  const v = value.toLowerCase();
+  if (v === 'done') {
+    return 'done';
+  }
+  if (v === 'waiting') {
+    return 'waiting';
+  }
+  if (v === 'skipped') {
+    return 'skipped';
+  }
+  return 'pending';
 }

@@ -51,6 +51,15 @@ function nowIso() {
   return new Date().toISOString();
 }
 
+/** Treat TRUE, true, "TRUE", "yes", 1 as truthy; everything else falsy. */
+function isActive(value) {
+  if (value === true) {
+    return true;
+  }
+  var normalized = String(value).trim().toLowerCase();
+  return normalized === 'true' || normalized === 'yes' || normalized === '1';
+}
+
 /**
  * Read a sheet into an array of plain objects keyed by the header row.
  * Empty sheets (header only) return [].

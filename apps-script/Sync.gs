@@ -1,12 +1,13 @@
 /**
  * Sync.gs
- * Delta sync endpoint. Returns only the groups changed since the client's
- * lastSync timestamp, plus a version hash and a fresh server timestamp.
+ * Delta sync endpoint. Returns groups changed since the client's lastSync
+ * timestamp, the full set of active requests (low volume), a version hash, and
+ * a fresh server timestamp. Every client converges through this single call.
  */
 
 /**
  * @param {string} since ISO timestamp from the client (empty on first load).
- * @return {{version:string, since:string, serverTime:string, changed:Array}}
+ * @return {{version, since, serverTime, changed:Array, requests:Array}}
  */
 function getSync(since) {
   var groups = readObjects(SHEETS.GROUPS);
@@ -14,16 +15,16 @@ function getSync(since) {
   var sinceTime = since ? Date.parse(since) : 0;
   var changed = [];
   for (var i = 0; i < groups.length; i++) {
-    var g = groups[i];
-    if (!since || changedSince(g.LastModified, sinceTime)) {
-      changed.push(g);
+    if (!since || changedSince(groups[i].LastModified, sinceTime)) {
+      changed.push(groups[i]);
     }
   }
   return {
     version: computeVersion(groups),
     since: since || '',
     serverTime: serverTime,
-    changed: changed
+    changed: changed,
+    requests: getActiveRequests(groups)
   };
 }
 

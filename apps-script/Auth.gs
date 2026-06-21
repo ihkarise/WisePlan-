@@ -1,33 +1,32 @@
 /**
  * Auth.gs
- * Token-in-URL authentication. The client sends a token with every call; we
- * resolve Name + Role from the Users sheet and reject unknown/inactive tokens.
+ * Single shared API key. Every request includes the key; we compare it against
+ * the value stored in Script Properties (set by setupSheets). There are no
+ * per-user tokens, roles, or login — this serves one event with a few trusted
+ * volunteers.
  */
+
+var API_KEY_PROPERTY = 'API_KEY';
 
 /**
- * Resolve a token to a user record.
- * @return {{userId:string, name:string, role:string}} on success.
- * @throws Error('UNAUTHORIZED') when the token is missing, unknown, or inactive.
+ * Validate the shared key. Throws Error('UNAUTHORIZED') when the key is missing
+ * or does not match. Returns true on success.
  */
-function resolveUser(token) {
-  if (!token) {
+function validateApiKey(key) {
+  var expected = PropertiesService.getScriptProperties().getProperty(API_KEY_PROPERTY);
+  if (!expected) {
+    throw new Error('API key not configured. Run setupSheets() once.');
+  }
+  if (!key || String(key) !== String(expected)) {
     throw new Error('UNAUTHORIZED');
   }
-  var users = readObjects(SHEETS.USERS);
-  for (var i = 0; i < users.length; i++) {
-    var u = users[i];
-    if (String(u.Token) === String(token) && isActive(u.Active)) {
-      return { userId: String(u.UserID), name: String(u.Name), role: String(u.Role) };
-    }
-  }
-  throw new Error('UNAUTHORIZED');
+  return true;
 }
 
-/** Treat TRUE, true, "TRUE", "yes", 1 as active; everything else inactive. */
-function isActive(value) {
-  if (value === true) {
-    return true;
+/** Resolve the acting volunteer's display name (optional, defaults to a label). */
+function resolveActor(payload) {
+  if (payload && payload.actor) {
+    return String(payload.actor).slice(0, 40);
   }
-  var normalized = String(value).trim().toLowerCase();
-  return normalized === 'true' || normalized === 'yes' || normalized === '1';
+  return 'Volunteer';
 }

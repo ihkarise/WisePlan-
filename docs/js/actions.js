@@ -11,6 +11,14 @@ import * as state from './state.js';
 // At most one queued write in v1 — no multi-action offline sync engine.
 let pendingWrite = null;
 
+// Optimistic field changes per status action (server sets the timestamps).
+const STATUS_PATCH = {
+  photoDone: { PhotoStatus: 'Done', FoodStatus: 'Waiting', CurrentStage: 'Food' },
+  photoSkip: { PhotoStatus: 'Skipped', FoodStatus: 'Waiting', CurrentStage: 'Food' },
+  foodDone: { FoodStatus: 'Done', CurrentStage: 'Completed' },
+  foodSkip: { FoodStatus: 'Skipped', CurrentStage: 'Completed' }
+};
+
 /**
  * Add a group with optimistic UI.
  * @param {Object} payload group fields from the form.
@@ -67,6 +75,78 @@ export function hasPendingWrite() {
   return pendingWrite !== null;
 }
 
+/**
+ * Advance a group's photo/food status with optimistic UI; revert on failure.
+ * @param {string} action one of STATUS_PATCH keys.
+ */
+export async function updateStatusAction(action, group, notifyUser) {
+  const patch = STATUS_PATCH[action];
+  if (!patch) {
+    return;
+  }
+  const prior = snapshot(group, patch);
+  state.patchGroupLocal(group.ID, patch);
+  try {
+    const saved = await api.updateGroupStatus(action, group.ID);
+    state.upsertGroups([saved]);
+  } catch (err) {
+    state.patchGroupLocal(group.ID, prior);
+    notifyUser(err.message || 'Action failed', 'error');
+  }
+}
+
+/** Raise a request for a group with optimistic UI; revert on failure. */
+export async function createRequestAction(group, notifyUser) {
+  const temp = buildOptimisticRequest(group);
+  state.addRequestLocal(temp);
+  try {
+    const saved = await api.requestGroup(group.ID);
+    state.removeRequestLocal(temp.RequestID);
+    state.addRequestLocal(saved);
+    notifyUser('Request sent', 'success');
+  } catch (err) {
+    state.removeRequestLocal(temp.RequestID);
+    notifyUser(err.message || 'Could not send request', 'error');
+  }
+}
+
+/** Resolve a request, clearing it from every banner; revert on failure. */
+export async function resolveRequestAction(request, notifyUser) {
+  state.removeRequestLocal(request.RequestID);
+  try {
+    await api.resolveRequest(request.RequestID);
+    notifyUser('Request resolved', 'success');
+  } catch (err) {
+    state.addRequestLocal(request);
+    notifyUser(err.message || 'Could not resolve request', 'error');
+  }
+}
+
+/** Capture the prior values of the fields a patch will overwrite. */
+function snapshot(group, fields) {
+  const prior = {};
+  Object.keys(fields).forEach((key) => {
+    prior[key] = group[key];
+  });
+  return prior;
+}
+
+/** Build a temporary local request so the banner appears immediately. */
+function buildOptimisticRequest(group) {
+  const now = new Date().toISOString();
+  return {
+    RequestID: 'tmp-' + now,
+    GroupID: group.ID,
+    RequestedBy: 'you',
+    Status: 'Active',
+    FoundBy: '',
+    Time: now,
+    GroupName: group.GroupName,
+    QueueNo: group.QueueNo,
+    _optimistic: true
+  };
+}
+
 /** Build a temporary local group so the dashboard updates immediately. */
 function buildOptimisticGroup(payload) {
   const now = new Date().toISOString();
@@ -78,9 +158,9 @@ function buildOptimisticGroup(payload) {
     Category: payload.category || '',
     SubCategory: payload.subCategory || '',
     Priority: payload.priority || 'Normal',
-    PhotoStatus: 'Pending',
+    PhotoStatus: 'Waiting',
     FoodStatus: 'Pending',
-    CurrentStage: 'Arrival',
+    CurrentStage: 'Photography',
     CurrentLocation: '',
     Notes: payload.notes || '',
     AddedBy: 'you',

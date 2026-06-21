@@ -7,8 +7,11 @@
 import { el } from '../utils/dom.js';
 
 const ITEMS = [
-  { route: 'dashboard', label: 'Dashboard', icon: '▤' },
-  { route: 'add', label: 'Add Group', icon: '＋' }
+  { route: 'dashboard', label: 'Home', icon: '▤' },
+  { route: 'photo', label: 'Photo', icon: '📷' },
+  { route: 'food', label: 'Food', icon: '🍽' },
+  { route: 'requests', label: 'Requests', icon: '🔔' },
+  { route: 'add', label: 'Add', icon: '＋' }
 ];
 
 /**

@@ -1,13 +1,12 @@
 /**
  * api.js
  * The ONLY module that talks to the backend. Reads use GET query params;
- * writes use POST with Content-Type:text/plain and a { action, token, payload }
+ * writes use POST with Content-Type:text/plain and a { action, key, payload }
  * body so Apps Script does not receive a CORS preflight. Every call handles
  * network failure, invalid responses, and retries idempotent reads.
  */
 
 import { CONFIG, isApiConfigured } from './config.js';
-import { getToken } from './utils/token.js';
 
 /** Thrown for any API failure; carries a user-friendly message and a code. */
 export class ApiError extends Error {
@@ -40,10 +39,28 @@ export async function addGroup(payload) {
   return data.group;
 }
 
-/** Build the GET URL with action, token, and extra params. */
+/** Advance a group's photo/food status. Returns the updated group. */
+export async function updateGroupStatus(action, groupId) {
+  const data = await postJson(action, { groupId });
+  return data.group;
+}
+
+/** Raise a request for a group. Returns the created request. */
+export async function requestGroup(groupId) {
+  const data = await postJson('requestGroup', { groupId });
+  return data.request;
+}
+
+/** Resolve an active request. Returns the updated request. */
+export async function resolveRequest(requestId) {
+  const data = await postJson('resolveRequest', { requestId });
+  return data.request;
+}
+
+/** Build the GET URL with action, key, and extra params. */
 function buildUrl(params) {
   const url = new URL(CONFIG.API_URL);
-  url.searchParams.set('token', getToken());
+  url.searchParams.set('key', CONFIG.API_KEY);
   Object.keys(params).forEach((key) => url.searchParams.set(key, params[key]));
   return url.toString();
 }
@@ -59,7 +76,7 @@ async function getJson(params, options = {}) {
 /** Perform a POST write with the text/plain envelope. Never auto-retried. */
 async function postJson(action, payload) {
   assertConfigured();
-  const body = JSON.stringify({ action, token: getToken(), payload: payload || {} });
+  const body = JSON.stringify({ action, key: CONFIG.API_KEY, payload: payload || {} });
   return request(CONFIG.API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },

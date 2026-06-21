@@ -1,8 +1,9 @@
-# Wise EventFlow — Milestone 1 Deployment
+# Wise EventFlow — Deployment
 
-This slice proves the full stack: a volunteer opens the GitHub Pages URL on a
-phone, installs the PWA, adds a group, and sees it appear on a second phone
-within ~5 seconds. Follow these steps in order.
+A volunteer opens the GitHub Pages URL on a phone, installs the PWA, and works
+the event: add groups, run the photography and food queues, and raise/resolve
+requests — all kept in sync across phones every ~5 seconds. Follow these steps
+in order.
 
 ## 1. Create the Google Sheet + Apps Script backend
 
@@ -10,16 +11,16 @@ within ~5 seconds. Follow these steps in order.
 2. In the Sheet: **Extensions → Apps Script**.
 3. Delete the default `Code.gs`, then create one script file per `.gs` file in
    [`apps-script/`](apps-script/) and paste the matching contents:
-   `Code.gs`, `Setup.gs`, `Auth.gs`, `Settings.gs`, `Groups.gs`, `Sync.gs`,
-   `Utils.gs`. (Apps Script concatenates all files, so the split is just for
-   readability.)
+   `Code.gs`, `Setup.gs`, `Auth.gs`, `Settings.gs`, `Groups.gs`, `Requests.gs`,
+   `Sync.gs`, `Utils.gs`. (Apps Script concatenates all files, so the split is
+   just for readability.)
 4. Optional but recommended: set the project manifest to match
    [`apps-script/appsscript.json`](apps-script/appsscript.json)
    (**Project Settings → Show "appsscript.json"**).
 5. Run the **`setupSheets`** function once (**Run → setupSheets**). Approve the
    permission prompt. It creates the six sheets with the exact blueprint §6
-   headers, seeds a default `Settings` row, and creates one **Admin** user.
-   A dialog shows the **admin token** — copy it.
+   headers, seeds a default `Settings` row, and generates the **shared API key**
+   (stored in Script Properties). A dialog shows the key — **copy it**.
 
 ## 2. Deploy the web app
 
@@ -38,7 +39,8 @@ within ~5 seconds. Follow these steps in order.
 
 1. Open [`docs/js/config.js`](docs/js/config.js).
 2. Set `API_URL` to the `/exec` URL from step 2.
-3. Commit and push.
+3. Set `API_KEY` to the shared key from step 1.
+4. Commit and push.
 
 ## 4. Publish with GitHub Pages
 
@@ -47,24 +49,26 @@ within ~5 seconds. Follow these steps in order.
 3. **Branch:** your working branch (or `main` after merge), **folder:** `/docs`.
 4. Save. Wait for the green check, then open the published URL.
 
-## 5. Sign in + test on real devices
+## 5. Test on real devices
 
-1. Build the sign-in URL: `https://<user>.github.io/<repo>/?t=<ADMIN_TOKEN>`.
-2. Open it on phone A. The token is saved and stripped from the address bar.
-3. **Add to Home Screen** to install the PWA.
-4. Add a group. It appears immediately (optimistic UI).
-5. Open the same sign-in URL on phone B — the group appears within ~5 seconds.
+1. Open the published URL on phone A. **Add to Home Screen** to install the PWA.
+2. **Add Group** → it appears immediately (optimistic UI) and on phone B within
+   ~5 seconds.
+3. **Photo** tab → **Photo Done** → the group leaves the photo queue and enters
+   the **Food** queue on every phone.
+4. **Food** tab → **Food Done** → the group is completed.
+5. **Requests** tab → pick a group → **Send request**. A banner appears at the
+   top of every phone. Tap **Resolve** on any phone and it clears everywhere.
 
-## Adding more volunteers (optional)
-
-Add a row to the **Users** sheet: `UserID`, `Name`, `Role`, a unique `Token`
-(any random string), `Active` = `TRUE`. Share their personal `?t=<token>` link.
+The shared API key in `config.js` authorizes every request — there is no login.
+All 5–10 volunteers use the same published URL.
 
 ## Troubleshooting
 
 - **`ping` works but app says "not configured":** `API_URL` still holds the
   placeholder — re-check step 3.
-- **Writes fail / nothing appears:** confirm access is **Anyone** and you did
-  not change the client to send `application/json` (it must stay `text/plain`).
-- **"Unknown or inactive token":** the `Users` row is missing, `Active` is not
-  `TRUE`, or the token in the URL does not match.
+- **`Invalid API key`:** `API_KEY` in `config.js` does not match the key shown by
+  `setupSheets()` (re-run it to view the stored key).
+- **Writes fail / nothing appears:** confirm access is **Anyone** and the client
+  still sends `text/plain` (never `application/json`, which triggers a preflight
+  Apps Script cannot answer).

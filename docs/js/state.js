@@ -12,13 +12,15 @@ const listeners = new Set();
 
 const state = {
   groups: new Map(),                       // keyed by group ID
+  requests: new Map(),                     // keyed by RequestID (active only)
   settings: readJson(CONFIG.STORAGE.SETTINGS, null),
   lastSync: readString(CONFIG.STORAGE.LAST_SYNC, ''),
   online: navigator.onLine
 };
 
-// Hydrate the group list from the cache so the UI renders instantly offline.
+// Hydrate from cache so the UI renders instantly, even offline.
 hydrateGroups();
+hydrateRequests();
 
 /** Subscribe to state changes. Returns an unsubscribe function. */
 export function subscribe(listener) {
@@ -74,6 +76,52 @@ export function removeGroupLocal(id) {
   }
 }
 
+/** Merge fields into one group (optimistic status change). No-op if absent. */
+export function patchGroupLocal(id, fields) {
+  const existing = state.groups.get(String(id));
+  if (!existing) {
+    return;
+  }
+  state.groups.set(String(id), Object.assign({}, existing, fields));
+  persistGroups();
+  notify();
+}
+
+/** Active requests, newest first, for the banner and requests page. */
+export function getRequests() {
+  return Array.from(state.requests.values())
+    .sort((a, b) => String(b.Time).localeCompare(String(a.Time)));
+}
+
+/** Replace the active request set (authoritative, from sync). */
+export function setRequests(requests) {
+  state.requests = new Map();
+  (requests || []).forEach((r) => {
+    if (r && r.RequestID) {
+      state.requests.set(String(r.RequestID), r);
+    }
+  });
+  persistRequests();
+  notify();
+}
+
+/** Optimistically add a single request. */
+export function addRequestLocal(request) {
+  if (request && request.RequestID) {
+    state.requests.set(String(request.RequestID), request);
+    persistRequests();
+    notify();
+  }
+}
+
+/** Optimistically remove a request (e.g. on resolve). */
+export function removeRequestLocal(id) {
+  if (state.requests.delete(String(id))) {
+    persistRequests();
+    notify();
+  }
+}
+
 export function setSettings(settings) {
   state.settings = settings;
   writeJson(CONFIG.STORAGE.SETTINGS, settings);
@@ -101,8 +149,21 @@ function hydrateGroups() {
   });
 }
 
+function hydrateRequests() {
+  const cached = readJson(CONFIG.STORAGE.REQUESTS, []);
+  cached.forEach((r) => {
+    if (r && r.RequestID) {
+      state.requests.set(String(r.RequestID), r);
+    }
+  });
+}
+
 function persistGroups() {
   writeJson(CONFIG.STORAGE.GROUPS, getGroups());
+}
+
+function persistRequests() {
+  writeJson(CONFIG.STORAGE.REQUESTS, getRequests());
 }
 
 function notify() {

@@ -1,9 +1,8 @@
 /**
  * Setup.gs
  * One-time provisioning. Run setupSheets() once from the Apps Script editor to
- * create the six sheets with their exact headers (blueprint section 6) and seed
- * an admin user + a default Settings row. Safe to re-run: existing sheets keep
- * their data; only missing sheets/headers/seed rows are added.
+ * create the six sheets (blueprint section 6), seed a default Settings row, and
+ * generate the shared API key (stored in Script Properties). Safe to re-run.
  */
 
 // Canonical Groups header order. Shared with Groups.gs serialization.
@@ -13,26 +12,29 @@ var GROUP_HEADERS = [
   'AddedBy', 'AddedTime', 'PhotoTime', 'FoodTime', 'LastModified'
 ];
 
+// Canonical Requests header order. Shared with Requests.gs serialization.
+var REQUEST_HEADERS = ['RequestID', 'GroupID', 'RequestedBy', 'Status', 'FoundBy', 'Time'];
+
 var SHEET_HEADERS = {
   Settings: ['EventName', 'PhotographyOpen', 'FoodOpen', 'Announcement'],
   Groups: GROUP_HEADERS,
   Categories: ['Category', 'SubCategory', 'Active', 'SortOrder'],
-  Requests: ['RequestID', 'GroupID', 'RequestedBy', 'Status', 'FoundBy', 'Time'],
+  Requests: REQUEST_HEADERS,
   Users: ['UserID', 'Name', 'Role', 'Token', 'Active'],
   ActivityLog: ['Timestamp', 'User', 'Action', 'GroupID', 'Details']
 };
 
-/** Provision all sheets, headers, and seed data. Run this once. */
+/** Provision all sheets, the default settings row, and the API key. */
 function setupSheets() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   Object.keys(SHEET_HEADERS).forEach(function (name) {
     ensureSheetWithHeaders(ss, name, SHEET_HEADERS[name]);
   });
   seedSettings();
-  var token = seedAdminUser();
+  var key = ensureApiKey();
   SpreadsheetApp.getUi().alert(
-    'Setup complete.\n\nAdmin token: ' + token +
-    '\n\nOpen the app with ?t=' + token + ' to sign in.'
+    'Setup complete.\n\nShared API key:\n' + key +
+    '\n\nPaste this into docs/js/config.js as API_KEY.'
   );
 }
 
@@ -58,21 +60,20 @@ function seedSettings() {
 }
 
 /**
- * Seed a single active Admin user with a random token when none exists.
- * Returns the admin token so the operator can build the sign-in URL.
+ * Ensure a shared API key exists in Script Properties, creating one if needed.
+ * Returns the key so the operator can paste it into config.js.
  */
-function seedAdminUser() {
-  var sheet = getSheet(SHEETS.USERS);
-  var existing = readObjects(SHEETS.USERS);
-  if (existing.length > 0) {
-    return String(existing[0].Token);
+function ensureApiKey() {
+  var props = PropertiesService.getScriptProperties();
+  var key = props.getProperty(API_KEY_PROPERTY);
+  if (!key) {
+    key = generateToken();
+    props.setProperty(API_KEY_PROPERTY, key);
   }
-  var token = generateToken();
-  sheet.appendRow(['U1', 'Admin', 'Admin', token, true]);
-  return token;
+  return key;
 }
 
-/** Generate a URL-safe random token. */
+/** Generate a URL-safe random key. */
 function generateToken() {
   return Utilities.getUuid().replace(/-/g, '').substring(0, 24);
 }
