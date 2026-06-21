@@ -6,7 +6,7 @@
  * volunteers.
  */
 
-var API_KEY_PROPERTY = 'API_KEY';
+var API_KEY_PROPERTY = '9175834234a14c5ba412e112';
 
 /**
  * Validate the shared key. Throws Error('UNAUTHORIZED') when the key is missing
