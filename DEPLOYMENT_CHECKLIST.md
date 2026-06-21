@@ -64,7 +64,9 @@ app from scratch. Tick each box as you go. Detailed reference: [DEPLOY.md](DEPLO
 ## Done — verify
 - [ ] Add a group on one phone; it appears on another within ~5 seconds.
 - [ ] (Optional) load test data: in Apps Script run `enableDevMode()` then
-      `seedData()`; remove later with `clearSeedData()` then `disableDevMode()`.
+      `seedData()` (50 groups) or `seedLargeDataset(100)` / `seedLargeDataset(200)`
+      for stress testing; remove later with `clearSeedData()` then
+      `disableDevMode()`.
 
 > Re-deploying the backend later: **Manage deployments → edit → Version: New
 > version** keeps the same `/exec` URL. Changing `docs/` later: bump

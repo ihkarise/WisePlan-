@@ -48,6 +48,20 @@ function seedSampleData() {
   return groups.length + ' groups + 5 requests seeded.';
 }
 
+/**
+ * Populate an arbitrary number of mixed groups for stress testing (default 100).
+ * Same mixed data as seedData(), plus 5 active requests. Dev mode only.
+ */
+function seedLargeDataset(count) {
+  assertDevMode();
+  var n = Number(count) > 0 ? Math.floor(Number(count)) : 100;
+  var groups = buildSampleGroups(n);
+  var sheet = getSheet(SHEETS.GROUPS);
+  sheet.getRange(sheet.getLastRow() + 1, 1, groups.length, GROUP_HEADERS.length).setValues(groups);
+  seedSampleRequests(groups, 5);
+  return n + ' groups + 5 requests seeded.';
+}
+
 /** Remove rows created by the seeder (IDs starting SEED-). Dev mode only. */
 function clearSampleData() {
   assertDevMode();
