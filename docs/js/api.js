@@ -17,17 +17,6 @@ export class ApiError extends Error {
   }
 }
 
-/** Health check (no auth required). */
-export async function ping() {
-  return getJson({ action: 'ping' }, { retry: true });
-}
-
-/** Fetch event settings. */
-export async function fetchSettings() {
-  const data = await getJson({ action: 'settings' }, { retry: true });
-  return data.settings;
-}
-
 /** Delta sync: pass the last server timestamp the client saw. */
 export async function fetchSync(since) {
   return getJson({ action: 'sync', since: since || '' }, { retry: true });

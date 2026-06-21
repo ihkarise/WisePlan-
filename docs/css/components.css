@@ -23,10 +23,11 @@
 
 .header__status {
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 700;
   padding: var(--space-1) var(--space-3);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(0, 0, 0, 0.22);
+  color: #fff;
 }
 
 .header__status.is-offline {
@@ -50,8 +51,8 @@
 }
 
 .header__theme {
-  min-width: 2.5rem;
-  min-height: 2.5rem;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
   border: none;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.18);
@@ -131,10 +132,6 @@
 
 .btn:disabled {
   opacity: 0.6;
-}
-
-.dashboard__add {
-  width: 100%;
 }
 
 .dashboard__count {
@@ -373,7 +370,7 @@
 }
 
 .request-banner__resolve {
-  min-height: 2.25rem;
+  min-height: 2.75rem;
   padding: 0 var(--space-4);
   flex: 0 0 auto;
 }
@@ -411,7 +408,7 @@
 }
 
 .request-row__resolve {
-  min-height: 2.5rem;
+  min-height: 2.75rem;
   padding: 0 var(--space-4);
   flex: 0 0 auto;
 }
@@ -496,7 +493,7 @@
 }
 
 .toggle__btn {
-  min-height: 2.5rem;
+  min-height: 2.75rem;
   padding: 0 var(--space-4);
   font-size: 0.85rem;
 }

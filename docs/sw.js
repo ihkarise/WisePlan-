@@ -5,7 +5,7 @@
  * Bump CACHE_VERSION on any shell change to invalidate old caches.
  */
 
-const CACHE_VERSION = 'wef-shell-v4';
+const CACHE_VERSION = 'wef-shell-v5';
 
 const SHELL_ASSETS = [
   './',

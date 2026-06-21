@@ -50,6 +50,10 @@ in order.
 3. **Branch:** your working branch (or `main` after merge), **folder:** `/docs`.
 4. Save. Wait for the green check, then open the published URL.
 
+> Updating later: when you change anything under `docs/`, bump `CACHE_VERSION`
+> in `docs/sw.js` (e.g. `wef-shell-v5` → `v6`) before pushing, so installed
+> phones purge the old cache and pick up the new shell on next launch.
+
 ## 5. Test on real devices
 
 1. Open the published URL on phone A. **Add to Home Screen** to install the PWA.

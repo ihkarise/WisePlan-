@@ -50,19 +50,3 @@
   font-size: var(--font-section);
   font-weight: 700;
 }
-
-.blocking {
-  max-width: 480px;
-  margin: 20vh auto 0;
-  text-align: center;
-  padding: var(--space-5);
-}
-
-.blocking__title {
-  font-size: var(--font-section);
-  margin-bottom: var(--space-3);
-}
-
-.blocking__detail {
-  color: var(--color-text-muted);
-}

@@ -87,3 +87,24 @@ textarea {
   font-family: inherit;
   font-size: var(--font-body);
 }
+
+/* Keyboard focus visibility (mouse/touch users are unaffected). */
+:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* On the teal header, a white ring stays visible. */
+.header :focus-visible {
+  outline-color: #fff;
+}
+
+/* Respect users who prefer reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

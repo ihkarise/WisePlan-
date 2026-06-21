@@ -1,7 +1,11 @@
 {
+  "id": "./",
   "name": "Wise EventFlow",
   "short_name": "EventFlow",
   "description": "Mobile operations for weddings and live events.",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["productivity", "utilities"],
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

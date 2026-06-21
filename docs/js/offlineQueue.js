@@ -31,11 +31,6 @@ export function size() {
   return queue.length;
 }
 
-/** True if a given operation id is already queued. */
-export function has(id) {
-  return queue.some((o) => o.id === id);
-}
-
 /**
  * Replay queued operations in order using the supplied runner.
  * @param {(op:Object)=>Promise<void>} runner resolves on success; throws an

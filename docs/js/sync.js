@@ -13,11 +13,12 @@ import { flushPending } from './actions.js';
 let timerId = null;
 let running = false;
 let syncing = false;
+let configErrorShown = false;
 let onStatus = () => {};
 
 /**
  * Start syncing. @param {(msg,kind)=>void} notify toast callback used for
- * reconnect/queue notifications.
+ * reconnect/queue/error notifications.
  */
 export function startSync(notify) {
   if (running) {
@@ -28,17 +29,7 @@ export function startSync(notify) {
   window.addEventListener('online', handleOnline);
   window.addEventListener('offline', handleOffline);
   document.addEventListener('visibilitychange', reschedule);
-  loadSettingsOnce();
   tick();
-}
-
-/** Stop syncing and detach listeners. */
-export function stopSync() {
-  running = false;
-  clearTimeout(timerId);
-  window.removeEventListener('online', handleOnline);
-  window.removeEventListener('offline', handleOffline);
-  document.removeEventListener('visibilitychange', reschedule);
 }
 
 /** Run one sync cycle now, then schedule the next. */
@@ -66,8 +57,21 @@ async function runSyncSafe() {
     await flushPending(onStatus);
   } catch (err) {
     state.setOnline(false);
+    reportConfigError(err);
   } finally {
     syncing = false;
+  }
+}
+
+/**
+ * Surface a persistent auth/config failure once, so a wrong API key does not
+ * just look like being permanently offline. Network/timeout errors stay quiet.
+ */
+function reportConfigError(err) {
+  const fatal = err && (err.code === 'UNAUTHORIZED' || err.code === 'NO_CONFIG');
+  if (fatal && !configErrorShown) {
+    configErrorShown = true;
+    onStatus(err.message || 'Cannot reach the server', 'error');
   }
 }
 
@@ -86,16 +90,6 @@ function applyResult(result) {
     state.setOnline(true);
     state.setSynced(true);
   });
-}
-
-/** Fetch settings a single time at startup (cached thereafter). */
-async function loadSettingsOnce() {
-  try {
-    const settings = await api.fetchSettings();
-    state.setSettings(settings);
-  } catch (err) {
-    // Keep any cached settings; the dashboard still renders.
-  }
 }
 
 function schedule() {

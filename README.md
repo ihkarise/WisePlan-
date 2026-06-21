@@ -74,6 +74,30 @@ deploy the web app (access: Anyone), paste the `/exec` URL and the shared API
 key into `docs/js/config.js`, enable GitHub Pages on `/docs`, then open the
 published URL on a phone.
 
+## Offline behavior
+
+- **Reads** are served from a localStorage cache, so the last-known queue renders
+  instantly and works with no connection.
+- **Writes** made while offline are added to a durable, de-duplicated queue,
+  shown optimistically, and replayed automatically on reconnect and after each
+  successful sync. The header shows **"Offline Mode"** and a queued count.
+- A wrong API key or misconfiguration surfaces a clear message rather than a
+  silent offline state.
+
+## Updates (PWA cache)
+
+The service worker uses a versioned cache (`wef-shell-vN`). Bump `CACHE_VERSION`
+in `docs/sw.js` whenever shell files change; on next load the old cache is purged
+and clients pick up the new shell.
+
+## Known limitations
+
+- No server-side idempotency key (client-side dedup mitigates duplicate writes).
+- Settings/announcement and categories are edited in the Google Sheet.
+- Optimistic request banner may briefly flicker before the next sync.
+
+See [CHANGELOG.md](CHANGELOG.md) for the full release history.
+
 ## Conventions
 
 - ≤ 400 lines per JS file, ≤ 40 lines per function.
