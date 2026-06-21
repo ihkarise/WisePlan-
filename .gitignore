@@ -1,0 +1,10 @@
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Local env / secrets (never commit tokens or the live API URL overrides)
+*.local
+.env

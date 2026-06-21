@@ -1,0 +1,63 @@
+/*
+ * layout.css
+ * App shell scaffolding: fixed header, scrollable view, fixed bottom nav.
+ * Mobile-first, one-hand friendly, safe-area aware.
+ */
+
+.app {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app__header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.app__view {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: var(--space-4);
+  padding-bottom: calc(var(--touch-target) + var(--space-5) + env(safe-area-inset-bottom));
+}
+
+.app__nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.section-title {
+  font-size: var(--font-section);
+  font-weight: 700;
+}
+
+.blocking {
+  max-width: 480px;
+  margin: 20vh auto 0;
+  text-align: center;
+  padding: var(--space-5);
+}
+
+.blocking__title {
+  font-size: var(--font-section);
+  margin-bottom: var(--space-3);
+}
+
+.blocking__detail {
+  color: var(--color-text-muted);
+}
